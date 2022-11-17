@@ -9,7 +9,7 @@ if LOCAL == False:
         ["hopsworks", "seaborn", "joblib", "scikit-learn"])
 
 
-    @stub.function(image=image, schedule=modal.Period(days=1), secret=modal.Secret.from_name("jim-hopsworks-ai"))
+    @stub.function(image=image, schedule=modal.Period(days=1), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
     def f():
         g()
 
