@@ -1,5 +1,6 @@
 import os
 import modal
+from hsfs.feature import Feature
 
 LOCAL = True
 DATASET_URL = "https://raw.githubusercontent.com/ID2223KTH/id2223kth.github.io/master/assignments/lab1/titanic.csv"
@@ -91,6 +92,22 @@ def g():
 
     # Add id for the feature store
     data_df['Id'] = data_df.index
+
+    data_df['Age'] = data_df['Age'].astype("int64")
+    data_df['Age_Class'] = data_df['Age_Class'].astype("int64")
+    data_df['Deck'] = data_df['Deck'].astype("int64")
+    data_df['Embarked'] = data_df['Embarked'].astype("int64")
+    data_df['Fare'] = data_df['Fare'].astype("int64")
+    data_df['Fare_Per_Person'] = data_df['Fare_Per_Person'].astype("int64")
+    data_df['Id'] = data_df['Id'].astype("int64")
+    data_df['Not_alone'] = data_df['Not_alone'].astype("int64")
+    data_df['Parch'] = data_df['Parch'].astype("int64")
+    data_df['Pclass'] = data_df['Pclass'].astype("int64")
+    data_df['Relatives'] = data_df['Relatives'].astype("int64")
+    data_df['Sex'] = data_df['Sex'].astype("int64")
+    data_df['SibSp'] = data_df['SibSp'].astype("int64")
+    data_df['Survived'] = data_df['Survived'].astype("int64")
+    data_df['Title'] = data_df['Title'].astype("int64")
 
     titanic_fg = fs.get_or_create_feature_group(
         name="titanic",
