@@ -1,13 +1,13 @@
 import os
 import modal
-from hsfs.feature import Feature
 
-LOCAL = True
+BACKFILL = False
+LOCAL = False
 DATASET_URL = "https://raw.githubusercontent.com/ID2223KTH/id2223kth.github.io/master/assignments/lab1/titanic.csv"
 
 if LOCAL == False:
     stub = modal.Stub()
-    image = modal.Image.debian_slim().pip_install(["hopsworks", "pandas", "numpy", "re"])
+    image = modal.Image.debian_slim().pip_install(["hopsworks", "joblib", "seaborn", "sklearn", "dataframe-image"])
 
 
     @stub.function(image=image, schedule=modal.Period(days=1), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
@@ -32,17 +32,31 @@ def process_titanic_data(data_df):
     # we can now drop the cabin feature
     data_df = data_df.drop(['Cabin'], axis=1)
 
-    # Age Feature
-    mean = data_df["Age"].mean()
-    std = data_df["Age"].std()
+    if BACKFILL:
+        # Age Feature
+        mean = data_df["Age"].mean()
+        std = data_df["Age"].std()
 
-    is_null = data_df["Age"].isnull().sum()
-    # compute random numbers between the mean, std and is_null
-    rand_age = np.random.randint(mean - std, mean + std, size=is_null)
-    # fill NaN values in Age column with random values generated
-    age_slice = data_df["Age"].copy()
-    age_slice[np.isnan(age_slice)] = rand_age
-    data_df["Age"] = age_slice
+        is_null = data_df["Age"].isnull().sum()
+        # compute random numbers between the mean, std and is_null
+        rand_age = np.random.randint(mean - std, mean + std, size=is_null)
+        # fill NaN values in Age column with random values generated
+        age_slice = data_df["Age"].copy()
+        age_slice[np.isnan(age_slice)] = rand_age
+        data_df["Age"] = age_slice
+        data_df["Age"] = data_df["Age"].astype(int)
+    else:
+        # Age Feature
+        is_null = data_df["Age"].isnull().sum()
+        if is_null == 1:
+            mean = 29.69911764705882
+            std = 14.526497332334042
+            # compute random numbers between the mean, std and is_null
+            rand_age = np.random.randint(mean - std, mean + std, size=is_null)
+            # fill NaN values in Age column with random values generated
+            #age_slice = data_df["Age"].copy()
+            #age_slice[np.isnan(age_slice)] = rand_age
+            data_df["Age"] = [rand_age]
     data_df["Age"] = data_df["Age"].astype(int)
 
     # Embarked Feature
@@ -104,25 +118,76 @@ def process_titanic_data(data_df):
 
     return data_df
 
+def get_random_passanger():
+    """
+    Returns a DataFrame containing one random iris flower
+    """
+    import pandas as pd
+    import random
+    #from random import randrange
+
+    #age = randrange(81)
+    #age_class = randrange(223)
+    #deck = randrange(9)
+    #embarked = randrange(3)
+    #fare = randrange(513)
+    #fare_per_person = randrange(513)
+    #not_alone = randrange(2)
+    #parch = randrange(7)
+    #pclass = randrange(1,4)
+    #relatives = randrange(11)
+    #sex = randrange(2)
+    #sibsp = randrange(9)
+    #title = randrange(1,6)
+
+    #titanic_df = pd.DataFrame({'age':age, 'age_class':age_class, 'deck':deck, 'embarked':embarked, 'fare':fare, 'fare_per_person':fare_per_person, 'not_alone':not_alone, 'parch':parch})
+
+    data_df = pd.read_csv(DATASET_URL, index_col=None)
+    s0 = data_df.Survived[data_df['Survived'] == 0].sample(1).index
+    s1 = data_df.Survived[data_df['Survived'] == 1].sample(1).index
+
+    pick_random = random.uniform(0, 2)
+
+    # Pick a non-survivor
+    if pick_random < 1:
+        titanic_df = data_df.iloc[s0[0]].to_frame().T
+        print("Non-survivor added")
+    # Pick a survivor
+    else:
+        titanic_df = data_df.iloc[s1[0]].to_frame().T.set_index("PassengerId")
+        print("Survivor added")
+
+    return titanic_df
+
 
 def g():
     import hopsworks
     import pandas as pd
-    import re
-    import numpy as np
 
     project = hopsworks.login()
     fs = project.get_feature_store()
-    data_df = pd.read_csv(DATASET_URL, index_col=0)
 
-    data_df = process_titanic_data(data_df)
+    if BACKFILL == True:
+        titanic_df = pd.read_csv("https://raw.githubusercontent.com/ID2223KTH/id2223kth.github.io/master/assignments/lab1/titanic.csv", index_col='PassengerId')
+    else:
+        titanic_df = get_random_passanger()
+    titanic_df = process_titanic_data(titanic_df)
+    titanic_df.columns = map(str.lower, titanic_df.columns)
+
+    print(titanic_df)
 
     titanic_fg = fs.get_or_create_feature_group(
         name="titanic_new",
         version=1,
         primary_key=['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Deck', 'Title', 'Age_Class', 'Relatives', 'Not_alone', 'Fare_Per_Person'],
         description="Processed titanic survivors dataset")
-    titanic_fg.insert(data_df, write_options={"wait_for_job": False})
+    tit = titanic_fg.read()
+    #print(tit)
+    titanic_df['passengerid'] = int(len(tit))
+    titanic_df = titanic_df.set_index("passengerid")
+    titanic_df = pd.concat([tit, titanic_df])
+    print(titanic_df.tail(5))
+    titanic_fg.insert(titanic_df, write_options={"wait_for_job": False})
 
 
 if __name__ == "__main__":

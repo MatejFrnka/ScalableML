@@ -29,18 +29,18 @@ def g():
     # The feature view is the input set of features for your model. The features can come from different feature groups.
     # You can select features from different feature groups and join them together to create a feature view
     try:
-        feature_view = fs.get_feature_view(name="titanic", version=1)
+        feature_view = fs.get_feature_view(name="titanic_new", version=1)
     except:
-        titanic_fg = fs.get_feature_group(name="titanic", version=1)
+        titanic_fg = fs.get_feature_group(name="titanic_new", version=1)
         query = titanic_fg.select_all()
-        feature_view = fs.create_feature_view(name="titanic",
+        feature_view = fs.create_feature_view(name="titanic_new",
                                               version=1,
                                               description="Read from titanic dataset",
                                               labels=["survived"],
                                               query=query)
 
     X, y = feature_view.training_data()
-    X = X.drop(['id'], axis=1)
+    # X = X.drop(['id'], axis=1)
 
     # Train our model with the Scikit-learn K-nearest-neighbors algorithm using our features (X_train) and labels (y_train)
     model = RandomForestClassifier(n_estimators=100)
@@ -50,12 +50,12 @@ def g():
     mr = project.get_model_registry()
 
     # The contents of the 'tmp_titanic_model' directory will be saved to the model registry. Create the dir, first.
-    model_dir = "tmp_titanic_model"
+    model_dir = "titanic_new_model"
     if os.path.isdir(model_dir) == False:
         os.mkdir(model_dir)
 
     # Save both our model and the confusion matrix to 'model_dir', whose contents will be uploaded to the model registry
-    joblib.dump(model, model_dir + "/titanic_model.pkl")
+    joblib.dump(model, model_dir + "/titanic_new_model.pkl")
 
     # Specify the schema of the model's input/output using the features (X_train) and labels (y_train)
     input_schema = Schema(X)
@@ -64,7 +64,7 @@ def g():
 
     # Create an entry in the model registry that includes the model's name, desc, metrics
     titanic_model = mr.python.create_model(
-        name="titanic",
+        name="titanic_new",
         model_schema=model_schema,
         description="Titanic survivor Predictor"
     )

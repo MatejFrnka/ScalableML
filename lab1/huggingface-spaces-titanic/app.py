@@ -12,9 +12,9 @@ project = hopsworks.login()
 fs = project.get_feature_store()
 
 mr = project.get_model_registry()
-model = mr.get_model("titanic", version=2)
+model = mr.get_model("titanic_new", version=1)
 model_dir = model.download()
-model = joblib.load(model_dir + "/titanic_model.pkl")
+model = joblib.load(model_dir + "/titanic_new_model.pkl")
 
 
 def get_deck(cabin):
