@@ -39,8 +39,8 @@ Whisper was developed and released in September 2022 by OpenAI to combat in the 
 The performance of the Whisper model can be further improved with fine-tuning of the model. This is especially true for low resource languages - languages with little data in the pre-training dataset. Out of the 680,000 hours of pre-training speech data, only 117,000 hours cover 96 smaller and less frequent languages. And surely, Swedish is one of the low resource languages.  
 
 To fine-tune our model on Swedish, we used the Huggingface Common Voices dataset (sv-SE). This dataset contains 12,360 short audio clips of spoken sentences which amounts to roughly 7-8 hours of data. From this fine-tuning we saw the following performance gains:
-* WER: 20.158
-* Training loss: 0.00482
+* Pre-trained Whisper model without fine-tuning WER: 62.55
+* Pre-trained Whisper model with fine-tuning WER: 20.16
 <br/><br/> 
 ## 4. Further Performance Gains
 
@@ -61,7 +61,7 @@ blir jag alltid lika berörd.
 
  Given these timestamps, the audio of the movie can be extracted for each timestamp and be mapped to the corresponding subtitle text, thereby generating more labeled speech data which can be used for the model for further fine-tuning.  
  
- We saw X performance gain in Swedish only using the ~7-8 hours of labeled Swedish data in the Huggingface Common Voices dataset. As previously stated, this data amounts to roughly 5 movies worth of data. If we were to generate labeled speech data from 10, or 20, Swedish movies and fine-tune the model further, then surely the performance of Whisper would keep improving for Swedish.
+ We saw a **67%** decrease in word error rate (WER) in Swedish only using the ~7-8 hours of labeled Swedish data for fine-tuning. As previously stated, this data amounts to roughly 5 movies worth of data. If we were to generate labeled speech data from 10, or 20, Swedish movies and fine-tune the model further, then surely the performance of Whisper would keep improving for Swedish.
 
 
 
