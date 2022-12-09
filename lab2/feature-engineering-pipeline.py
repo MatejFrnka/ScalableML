@@ -7,8 +7,8 @@ from feature_extraction import feature_extractor, tokenizer
 
 common_voice = DatasetDict()
 
-common_voice["train"] = load_dataset(DATASET_PATH, DATASET_NAME, split="train+validation", use_auth_token=True)
-common_voice["test"] = load_dataset(DATASET_PATH, DATASET_NAME, split="test", use_auth_token=True)
+common_voice["train"] = load_dataset(DATASET_PATH, DATASET_NAME, split="train+validation")
+common_voice["test"] = load_dataset(DATASET_PATH, DATASET_NAME, split="test")
 
 # Drop unnecessary columns
 common_voice = common_voice.remove_columns(
@@ -33,4 +33,4 @@ def prepare_dataset(batch):
 
 
 common_voice = common_voice.map(prepare_dataset, remove_columns=common_voice.column_names["train"], num_proc=8)
-common_voice.save_to_disk(MODEL_PATH)
+common_voice.save_to_disk(TRAINING_DATA_PATH)

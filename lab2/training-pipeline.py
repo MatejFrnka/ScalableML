@@ -1,7 +1,7 @@
 import torch
 from datasets import DatasetDict
 from huggingface_hub import notebook_login, interpreter_login
-from transformers import Seq2SeqTrainingArguments
+from transformers import Seq2SeqTrainingArguments, Seq2SeqTrainer
 from dataclasses import dataclass
 from typing import Any, Dict, List, Union
 from feature_extraction import feature_extractor, processor, tokenizer
@@ -39,7 +39,7 @@ class DataCollatorSpeechSeq2SeqWithPadding:
         return batch
 
 
-common_voice = DatasetDict.load_from_disk(MODEL_PATH)
+common_voice = DatasetDict.load_from_disk(TRAINING_DATA_PATH)
 data_collator = DataCollatorSpeechSeq2SeqWithPadding(processor=processor)
 metric = evaluate.load("wer")
 
@@ -88,7 +88,6 @@ training_args = Seq2SeqTrainingArguments(
     push_to_hub=True,
 )
 
-from transformers import Seq2SeqTrainer
 
 trainer = Seq2SeqTrainer(
     args=training_args,
