@@ -20,6 +20,7 @@ In this lab, we built a (Swedish) speech to AI generated picture service and mad
 * Downloaded a pretrained automated speech recognition (ASR) model **Whisper**
 * Fine-tuned the Whisper model on Swedish using the Common Voice dataset
 * Used the model to transcribe the received voice audio to text
+* Translated to english using a deepl translator api
 * Fed the text into OpenAI's text to image generator DALL-E
 * Hosted the service on as an Huggingface app
 
@@ -38,9 +39,8 @@ Whisper was developed and released in September 2022 by OpenAI to combat in the 
 The performance of the Whisper model can be further improved with fine-tuning of the model. This is especially true for low resource languages - languages with little data in the pre-training dataset. Out of the 680,000 hours of pre-training speech data, only 117,000 hours cover 96 smaller and less frequent languages. And surely, Swedish is one of the low resource languages.  
 
 To fine-tune our model on Swedish, we used the Huggingface Common Voices dataset (sv-SE). This dataset contains 12,360 short audio clips of spoken sentences which amounts to roughly 7-8 hours of data. From this fine-tuning we saw the following performance gains:
-* Gains
-* Gains
-* Gains
+* WER: 20.158
+* Training loss: 0.00482
 <br/><br/> 
 ## 4. Further Performance Gains
 
