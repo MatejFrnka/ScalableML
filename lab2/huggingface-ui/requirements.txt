@@ -2,3 +2,4 @@ deepl
 openai
 transformers
 torch
+sentencepiece

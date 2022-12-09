@@ -12,7 +12,7 @@ TARGET_LANG = "EN-GB"
 deepl_key = os.environ.get('DEEPL')
 openai.api_key = os.environ.get('OPENAI')
 
-whisper = pipeline(model="openai/whisper-small")  # change to "your-username/the-name-you-picked"
+whisper = pipeline(model="frnka/whisper-small-SE")  # change to "your-username/the-name-you-picked"
 translator = deepl.Translator(deepl_key)
 
 
